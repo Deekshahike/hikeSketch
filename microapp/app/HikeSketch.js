@@ -12,9 +12,11 @@ import {
   FlatList,
   TouchableHighlight,
   TouchableOpacity,
+  Platform
 
 } from 'react-native';
-
+import AppTheme from 'hikereactsdk/appthemes/AppTheme';
+import CardView from './CardView';
 import SignaturePad from './SignaturePad';
 
 export default class HikeSketch extends Component {
@@ -32,6 +34,12 @@ export default class HikeSketch extends Component {
       { color: '#00FF00' },
       { color: '#FFA500' },
       { color: '#FFFFFF'}];
+      var currentThemeData = this.props.current_theme_data;
+		if (currentThemeData) {
+			if (Platform.OS === 'android')
+			currentThemeData = JSON.parse(currentThemeData);
+			AppTheme.initThemeData(currentThemeData);
+		}
   }
 
 
@@ -75,17 +83,13 @@ shallowEqual(objA, objB) {
   }
 
 
+  componentWillReceiveProps(initProps) {
+    console.log("Deeksha here i m in componentWIll");
+    
+      this.forceUpdate();
+    
 
-
-
-
-
-
-
-
-
-
-
+  }
 
   strokeComponent(color){
             return( <View style={[{ backgroundColor: color }, styles.strokeColorButton]} >
@@ -114,15 +118,19 @@ shallowEqual(objA, objB) {
     </TouchableOpacity>
   )
   render = () => {
-    console.log(this.state.color)
+    console.log("main render");
+     let appData = { ...this.props };
+     if (appData.triggerPoint == "card") return (<CardView appData={appData} />);
     return (
       <View style={{flex:1,backgroundColor: '#2b2b2b'}}>
         
         
-           <SignaturePad onError={this._signaturePadError}
+           <SignaturePad 
+                      appData = {appData}
+                      onError={this._signaturePadError}
                         onChange={this._signaturePadChange}
                         penColor={'#FF0000' }
-                        style={{flex: 1, backgroundColor: '#292C33'}}/>
+                        style={{flex: 1, backgroundColor: 'transparent'}}/>
           
         
       </View>  

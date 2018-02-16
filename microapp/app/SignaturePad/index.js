@@ -5,9 +5,17 @@ import {
   View,
   WebView,
   StyleSheet,
+  BackHandler,
+   NativeModules,
+   Platform,
+   ActivityIndicator
+
 } from 'react-native';
 
-
+import AppTheme from 'hikereactsdk/appthemes/AppTheme'
+import ThemeText from 'hikereactsdk/appthemes/components/ThemeText';
+import {DialogBox} from 'hikereactsdk';
+import {HikeUtils,HikeAppState} from 'hikereactsdk';
 import htmlContent from './injectedHtml';
 // import injectedSignaturePad from './injectedJavaScript/signaturePad';
 // import injectedApplication from './injectedJavaScript/application';
@@ -36,6 +44,10 @@ class SignaturePad extends Component {
   constructor(props) {
     console.log("i m here");
     super(props);
+    this.sendingData='';
+    this.onMessage = this.onMessage.bind(this);
+    this.negativePress = this.negativePress.bind(this);
+    this.positivePress = this.positivePress.bind(this);
     this.state = {base64DataUrl: props.dataURL || null};
     const { backgroundColor } = StyleSheet.flatten(props.style);
     // var injectedJavaScript = injectedExecuteNativeFunction
@@ -57,6 +69,9 @@ class SignaturePad extends Component {
     
 
    }
+   negativePress() {
+    this.setState({ showDialog: false });
+  }
   _onNavigationChange = (args) => {
     this._parseMessageFromWebViewNavigationChange(unescape(args.url));
   };
@@ -126,10 +141,126 @@ class SignaturePad extends Component {
   _renderLoading = (args) => {
 
   };
+  base64ToImage(base64Str, path, optionalObj) {
 
+    if (!base64Str || !path) {
+        throw new Error('Missing mandatory arguments base64 string and/or path string');
+    }
+
+    var optionalObj = optionalObj || {};
+    var imageBuffer = decodeBase64Image(base64Str);
+    var imageType = optionalObj.type || imageBuffer.type || 'png';
+    var fileName = optionalObj.fileName || 'img-' + Date.now();
+    var abs;
+    var fileName = '' + fileName;
+
+    if (fileName.indexOf('.') === -1) {
+        imageType = imageType.replace('image/', '');
+        fileName = fileName + '.' + imageType;
+    }
+
+    abs = path + fileName;
+    fs.writeFile(abs, imageBuffer.data, 'base64', function(err) {
+        if (err && optionalObj.debug) {
+            console.log("File image write error", err);
+        }
+
+    });
+    return {
+        'imageType': imageType,
+        'fileName': fileName
+    };
+}
+ decodeBase64Image(base64Str) {
+    var matches = base64Str.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+    var image = {};
+    if (!matches || matches.length !== 3) {
+        throw new Error('Invalid base64 string');
+    }
+
+    image.type = matches[1];
+    image.data = new Buffer(matches[2], 'base64');
+
+    return image;
+}
+  onMessage(data){
+    console.log( data.nativeEvent.data);
+    this.sendingData = data.nativeEvent.data;
+     this.setState({showDialog :true});
+     this.positivePress();
+  }
+  positivePress() {
+    
+    const { appData } = this.props;
+    console.log(this.props.appData);
+   // var data = { 'filePath': this.pathname.slice(8), 'uploadUrl': "https://microapps-175405.appspot.com/image/upload", 'doCompress': false };
+   var data = {
+     "imgData" : this.sendingData,
+
+   };
+    HikeUtils.doPost('IMAGE_UPLOAD', {
+      data: data
+    }).then(
+      (data) => {
+         
+        console.log( data );
+        
+        
+        var user_id = Platform.OS == 'ios' ? appData.msisdn : JSON.parse(appData.passData).uid;
+        if (!user_id) {
+          user_id = Platform.OS == 'ios'? appData.msisdn :JSON.parse(appData.passData).group_id;
+        }
+        var ssm = {
+          cardData: JSON.stringify({
+            h: 200,
+            layoutId: "index.html",
+            ld: {
+              msisdn: "+hikesketch+"
+            },
+            hd: {
+              imageUrl:Platform.OS == 'ios'?data.imageUrl : JSON.parse(data.response).imageUrl
+            },
+            parent_msisdn: "+hikesketch+",
+            push: "silent",
+            notifText: "Surprise!!!"
+          }),
+          hikeMessage: "Surprise!!!",
+          sharedData: JSON.stringify({
+            recipients: "hikesketch",
+            cd: {
+              imageUrl:Platform.OS == 'ios'?data.imageUrl :JSON.parse(data.response).imageUrl
+
+            }
+          }),
+          userId: user_id,
+          isReact: true
+        }
+        console.log(user_id);
+        console.log(ssm)
+        NativeModules.HikeSharingModule.sendSharedMessage(ssm);
+        this.setState({ showDialog: false });
+        if(Platform.OS == 'ios'){
+          HikeAppState.exitApp();
+        }else{
+        BackHandler.exitApp(0);
+        }
+      }).catch((exception) => {
+        console.log("uploading exception")
+
+      })
+  }
   render = () => {
    
     return (
+      <View style={{flex :1}}>
+        {this.state.showDialog ?
+          
+         <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
+              <ActivityIndicator color={AppTheme.getColorPalette().accentColor} size={ 'large'} />
+            </View>
+          :
+          null} 
+
         <WebView automaticallyAdjustContentInsets={false}
                  onNavigationStateChange={this._onNavigationChange}
                  renderError={this._renderError}
@@ -137,8 +268,11 @@ class SignaturePad extends Component {
                  source={this.source}
                  javaScriptEnabled={true}
                  style={this.props.style}
-                 injectedJavaScript={this.props.penColor}
-                 onMessage = {(event)=> console.log(event.nativeEvent.data + " "+  this.props.penColor)}/>
+                 onMessage = {this.onMessage}
+                 pointerEvents={'none'}
+                 scalesPageToFit={false}/>
+
+        </View>         
     )
   };
 }

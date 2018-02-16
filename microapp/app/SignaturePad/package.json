@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/DispatcherInc/react-native-signature-pad.git"
   },
+  
   "keywords": [
     "react-native",
     "react-component",
