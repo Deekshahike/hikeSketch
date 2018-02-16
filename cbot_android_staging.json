@@ -1,0 +1,65 @@
+[
+  {
+    "t": "ac",
+    "d": {
+     "addUrl": [
+            {
+                "urlKey": "IMAGE_UPLOAD",
+                "url": "https://microapps-175405.appspot.com/api/image/upload/base64"
+            }],
+      "reactDebugForceDisable": true,
+      "cbot": [
+        {
+          "name": "Doodle",
+          "reactVersion": "0.47",
+          "msisdn": "+hikesketch+",
+          "uid": "u:WoJvE5K1KwnOfrB6",
+          "bot_type": "nm_bot",
+          "nameSpace": "hikesketch",
+          "enable_bot": false,
+          "version": 5,
+          "notif": "off",
+          "config": "4096",
+          "has_react_cards": true,
+          "md": {
+            "parent_msisdn": "+hikesketch+",
+            "target_platform": 20,
+            "loader": false,
+            "loader_timeout": 31,
+            "loader_animation": "crossFade",
+            "nativeLoader": "#1E81F5",
+            "hide_loader": "true",
+            "fullsize": "true",
+            "nm_type": "react_native_mode",
+            "resume_supported": true,
+            "fwdCardObj": {
+              "parent_msisdn": "+hikesketch+",
+              "lpd": true,
+              "appName": "hikesketch",
+              "nameSpace": "hikesketch",
+              "mAppVersionCode": 5
+            },
+            "cardObj": {
+              "spl": true,
+              "lpd": true,
+              "ld": {},
+              "hm": "Send sketch to  Friends",
+              "appName": "hikesketch",
+              "mAppVersionCode": 5,
+              "appPackage": "https://mcap-staging.hike.in/micro-apps/pushkartest/android/v5/hikesketch.zip"
+            },
+            "palette": {
+              "is_group": true,
+              "is_one_to_one": true,
+              "order": 1,
+              "icon_type": "medium",
+              "cta": "panel",
+             "height":300
+            }
+          }
+        }
+      ]
+    },
+    "f": "+hikepayments+"
+  }
+]

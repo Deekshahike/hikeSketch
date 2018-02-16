@@ -15,7 +15,7 @@ import {
 import AppTheme from 'hikereactsdk/appthemes/AppTheme'
 import ThemeText from 'hikereactsdk/appthemes/components/ThemeText';
 import {DialogBox} from 'hikereactsdk';
-import {HikeUtils,HikeAppState} from 'hikereactsdk';
+import {HikeUtils,HikeAppState,HikeSharing} from 'hikereactsdk';
 import htmlContent from './injectedHtml';
 // import injectedSignaturePad from './injectedJavaScript/signaturePad';
 // import injectedApplication from './injectedJavaScript/application';
@@ -205,14 +205,14 @@ class SignaturePad extends Component {
          
         console.log( data );
         
-        
-        var user_id = Platform.OS == 'ios' ? appData.msisdn : JSON.parse(appData.passData).uid;
+        var user_id = JSON.parse(appData.passData).group_id;
         if (!user_id) {
-          user_id = Platform.OS == 'ios'? appData.msisdn :JSON.parse(appData.passData).group_id;
+          user_id = Platform.OS == 'ios' ? appData.msisdn : JSON.parse(appData.passData).uid;;
         }
         var ssm = {
           cardData: JSON.stringify({
             h: 200,
+            is_transparent : true,
             layoutId: "index.html",
             ld: {
               msisdn: "+hikesketch+"
@@ -237,7 +237,7 @@ class SignaturePad extends Component {
         }
         console.log(user_id);
         console.log(ssm)
-        NativeModules.HikeSharingModule.sendSharedMessage(ssm);
+        HikeSharing.sendSharedMessage(ssm);
         this.setState({ showDialog: false });
         if(Platform.OS == 'ios'){
           HikeAppState.exitApp();
@@ -258,9 +258,8 @@ class SignaturePad extends Component {
          <View style={{flex: 1,justifyContent: 'center',alignItems: 'center'}}>
               <ActivityIndicator color={AppTheme.getColorPalette().accentColor} size={ 'large'} />
             </View>
+          
           :
-          null} 
-
         <WebView automaticallyAdjustContentInsets={false}
                  onNavigationStateChange={this._onNavigationChange}
                  renderError={this._renderError}
@@ -271,7 +270,7 @@ class SignaturePad extends Component {
                  onMessage = {this.onMessage}
                  pointerEvents={'none'}
                  scalesPageToFit={false}/>
-
+        }
         </View>         
     )
   };

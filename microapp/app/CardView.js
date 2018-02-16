@@ -41,6 +41,11 @@ class CardView extends React.Component {
       loadingDone:true,
       uri:this.hd.imageUrl,
     }
+    try {
+      HikeChatCard.hideLoaderForMessageHash(this.h);
+    }catch(e){
+      console.log(e);
+    }
     
   }
   
@@ -59,6 +64,11 @@ class CardView extends React.Component {
           this.isSent =initProps.appData.isSent ;
       this.setState({uri : JSON.parse(initProps.appData.cardObj).hd.imageUrl});
         }
+    }
+    try {
+      HikeChatCard.hideLoaderForMessageHash(initProps.appData.messageHash);
+    }catch(e){
+      console.log(e);
     }
 
   }
