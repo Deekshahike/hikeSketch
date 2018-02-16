@@ -17,10 +17,7 @@ import ThemeText from 'hikereactsdk/appthemes/components/ThemeText';
 import {DialogBox} from 'hikereactsdk';
 import {HikeUtils,HikeAppState,HikeSharing} from 'hikereactsdk';
 import htmlContent from './injectedHtml';
-// import injectedSignaturePad from './injectedJavaScript/signaturePad';
-// import injectedApplication from './injectedJavaScript/application';
-// import injectedErrorHandler from './injectedJavaScript/errorHandler';
-// import injectedExecuteNativeFunction from './injectedJavaScript/executeNativeFunction';
+
 
 class SignaturePad extends Component {
 
@@ -50,23 +47,14 @@ class SignaturePad extends Component {
     this.positivePress = this.positivePress.bind(this);
     this.state = {base64DataUrl: props.dataURL || null};
     const { backgroundColor } = StyleSheet.flatten(props.style);
-    // var injectedJavaScript = injectedExecuteNativeFunction
-    //   + injectedErrorHandler
-    //   + injectedSignaturePad
-    //   + injectedApplication( backgroundColor, props.dataURL);
+  
    var html = htmlContent(props.penColor,backgroundColor, props.dataURL);
      this.source = {html}; //We don't use WebView's injectedJavaScript because on Android, the WebView re-injects the JavaScript upon every url change. Given that we use url changes to communicate signature changes to the React Native app, the JS is re-injected every time a stroke is drawn.
   }
    componentWillReceiveProps(nextProps){
      console.log("i m in  recieve props" + this.props.penColor + nextProps.penColor );
      
-    //const { backgroundColor } = StyleSheet.flatten(nextProps.style);
-    // var injectedJavaScript = injectedExecuteNativeFunction
-    //   + injectedErrorHandler
-    //   + injectedSignaturePad
-    //   + injectedApplication( backgroundColor, nextProps.dataURL);
-    // this.html = htmlContent(injectedJavaScript);
-    
+
 
    }
    negativePress() {
